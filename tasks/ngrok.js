@@ -51,8 +51,8 @@ module.exports = function (grunt) {
 
         fs.writeFileSync(fileName, yaml.safeDump(yamlConfig));
 
-        if (!fs.existsSync(__dirname + '/../bin' + getNgrokBin())) {
-            grunt.fatal('No ngrok bin at ' + __dirname + '/../bin' + getNgrokBin());
+        if (!fs.existsSync(__dirname + '/../bin/' + getNgrokBin())) {
+            grunt.fatal('No ngrok bin at ' + __dirname + '/../bin/' + getNgrokBin());
         }
 
         var ngrok = spawn(
