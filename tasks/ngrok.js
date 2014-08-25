@@ -55,7 +55,7 @@ module.exports = function (grunt) {
         }
 
         var ngrok = spawn(
-            getNgrokBin(),
+                __dirname + '/../bin/' + getNgrokBin(),
             ['-config=' + fileName, '-log=stdout', 'start', options.subdomain]
         );
 

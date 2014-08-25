@@ -5,6 +5,5 @@ node_js:
 before_script:
   - npm install -g grunt-cli
   - ls -lha ./bin
-  - ./bin/ngrok
 script:
   - grunt test -d -stack
