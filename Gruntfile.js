@@ -9,6 +9,11 @@
 'use strict';
 
 module.exports = function (grunt) {
+    function getRandomPort() {
+        return Math.round(Math.random() * (65535 - 50000) + 50000);
+    }
+
+    var tcpPort = getRandomPort();
 
     // Project configuration.
     grunt.initConfig({
@@ -40,8 +45,8 @@ module.exports = function (grunt) {
                 proto: 'https'
             },
             httpSubdomain: {
-                subdomain: 'grunt-ngrok-test',
-                expect: 'http://grunt-ngrok-test.ngrok.com'
+                subdomain: 'grunt-ngrok-test' + tcpPort, // just for random
+                expect: 'http://grunt-ngrok-test' + tcpPort + '.ngrok.com'
             },
             tcp: {
                 name: 'tcp',
@@ -49,9 +54,9 @@ module.exports = function (grunt) {
             },
             tcpRemote: {
                 name: 'tcpRemote',
-                expect: 'tcp://ngrok.com:64321',
+                expect: 'tcp://ngrok.com:' + tcpPort,
                 proto: 'tcp',
-                remotePort: 64321
+                remotePort: tcpPort
             }
         },
 
