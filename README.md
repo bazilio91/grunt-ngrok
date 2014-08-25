@@ -1,4 +1,6 @@
 # grunt-ngrok
+[![Dependency Status](https://david-dm.org/bazilio91/grunt-ngrok.svg)](https://david-dm.org/bazilio91/grunt-ngrok)
+[![devDependency Status](https://david-dm.org/bazilio91/grunt-ngrok/dev-status.svg)](https://david-dm.org/bazilio91/grunt-ngrok#info=devDependencies)
 
 Exposes local port to the web.
 
