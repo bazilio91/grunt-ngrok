@@ -1,7 +1,7 @@
 {
   "name": "grunt-ngrok",
   "description": "Exposes local port to the web.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/bazilio91/grunt-ngrok",
   "author": {
     "name": "Vasily Ostanin",
