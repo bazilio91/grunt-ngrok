@@ -66,7 +66,7 @@ Example:
 grunt.initConfig({
   ngrok: {
     options: {
-      authToken: '-LgL9yAD_PcQoSXfhD2q'
+      authToken: '-your-auth-token'
     },
     server: {
       proto: 'tcp',
