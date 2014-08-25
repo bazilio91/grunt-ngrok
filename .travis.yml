@@ -4,7 +4,7 @@ node_js:
   - "0.10"
 before_script:
   - npm install -g grunt-cli
-  - ls ./bin
+  - ls -lha ./bin
   - ls ./.*
 script:
   - grunt test -d -stack
