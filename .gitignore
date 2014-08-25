@@ -1,0 +1,6 @@
+# IDE
+/*.iml
+/.idea
+/bin
+/node_modules
+/npm-debug.log
