@@ -5,6 +5,8 @@
 
 > Exposes local port to the web.
 
+[![NPM](https://nodei.co/npm/grunt-ngrok.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/grunt-ngrok/)
+
 ## Getting Started
 This plugin requires Grunt `~0.4.0`
 
