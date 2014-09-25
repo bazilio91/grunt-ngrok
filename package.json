@@ -25,9 +25,7 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt test",
-    "postinstall": "node ./postinstall.js",
-    "postupdate": "node ./postinstall.js"
+    "test": "grunt test"
   },
   "devDependencies": {
     "async": "^0.9.0",
