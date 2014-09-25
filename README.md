@@ -77,8 +77,7 @@ Example: `"http://user:password@10.0.0.1:3128"`
 
 #### serverAddress
 Type: `String`  
-Default: `null`
-Binary default: `ngrok.com:4443`
+Default: `null`Binary default: `ngrok.com:4443`
 
 Address of ngrokd server
 
