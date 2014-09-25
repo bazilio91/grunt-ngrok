@@ -63,6 +63,44 @@ Default: `null`
 
 Callback function called when url acquired
 
+#### inspectAddress
+Type: `String`
+Default: `null`
+Binary default: `127.0.0.1:4040`
+
+Address that ngrok binds with to serve its web inspection interface
+
+#### httpProxy
+Type: `String`
+Default: `null`
+Example: `"http://user:password@10.0.0.1:3128"`
+
+#### serverAddress
+Type: `String`  
+Default: `null`
+Binary default: `ngrok.com:4443`
+
+Address of ngrokd server
+
+#### trustHostRootCerts
+Type: `Bool`
+Default: `null`
+Trust ngrok server root CA ot not. See [self hosting guide](https://github.com/inconshreveable/ngrok/blob/master/docs/SELFHOSTING.md#ngrokd-with-a-self-signed-ssl-certificate)
+
+#### files
+Type: `Object`
+Default: equinox.io ngrok official urls
+Example: 
+```js
+{
+  darwinia32: 'http://127.0.0.1/darwinia32.zip',
+  linuxarm: 'http://127.0.0.1/linuxarm.zip',
+}
+```
+
+Urls for your own ngrok client binaries. Zip should contain `ngrok` or `ngrok.exe`.
+
+
 Example:
 ```js
 grunt.initConfig({
