@@ -76,7 +76,7 @@ module.exports = function (grunt) {
             );
 
             ngrok.stdout.on('data', function (data) {
-                var urlMatch = data.toString().match(/\[INFO\] \[client\] Tunnel established at ((tcp|https?)..*.([^:]*)(:[0-9]+)?)/);
+                var urlMatch = data.toString().match(/\[INFO\] \[client\] Tunnel established at ((tcp|https?)..*.([^:\s]*)(:[0-9]+)?)/);
                 if (urlMatch && urlMatch[1]) {
                     tunnelUrl = urlMatch[1];
                     ngrokTunnels[tunnelUrl] = ngrok;
