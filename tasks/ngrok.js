@@ -53,6 +53,15 @@ module.exports = function (grunt) {
             }
         });
 
+        yamlConfig.tunnels[options.subdomain] = {proto: {}};
+        if (options.remotePort) {
+            yamlConfig.tunnels[options.subdomain]['remote_port'] = parseInt(options.remotePort);
+        }
+
+        yamlConfig.tunnels[options.subdomain].proto[options.proto] = options.port;
+
+        fs.writeFileSync(fileName, yaml.safeDump(yamlConfig));
+
         if (options.files !== null) {
             fetcher.files = options.files;
         }
@@ -62,21 +71,12 @@ module.exports = function (grunt) {
                 grunt.fatal(err);
             }
 
-            yamlConfig.tunnels[options.subdomain] = {proto: {}};
-            if (options.remotePort) {
-                yamlConfig.tunnels[options.subdomain]['remote_port'] = parseInt(options.remotePort);
-            }
-
-            yamlConfig.tunnels[options.subdomain].proto[options.proto] = options.port;
-
-            fs.writeFileSync(fileName, yaml.safeDump(yamlConfig));
-
             var ngrok = spawn(
                 binaryPath, ['-config=' + fileName, '-log=stdout', 'start', options.subdomain]
             );
 
             ngrok.stdout.on('data', function (data) {
-                var urlMatch = data.toString().match(/\[INFO\] \[client\] Tunnel established at ((tcp|https?)..*.ngrok.com(:[0-9]+)?)/);
+                var urlMatch = data.toString().match(/\[INFO\] \[client\] Tunnel established at ((tcp|https?)..*.([^:]*)(:[0-9]+)?)/);
                 if (urlMatch && urlMatch[1]) {
                     tunnelUrl = urlMatch[1];
                     ngrokTunnels[tunnelUrl] = ngrok;
@@ -87,10 +87,10 @@ module.exports = function (grunt) {
                     done();
                     return grunt.event.emit('ngrok.' + task.target + '.connected', tunnelUrl);
                 }
-                var urlBusy = data.toString().match(/\[EROR\] \[client\] Server failed to allocate tunnel: The tunnel ((tcp|http|https)..*.ngrok.com([0-9]+)?) (.*is already registered)/);
+                var urlBusy = data.toString().match(/\[EROR\] \[client\] Server failed to allocate tunnel: The tunnel ((tcp|http|https)..*.([^:]*)([0-9]+)?) (.*is already registered)/);
                 if (urlBusy && urlBusy[1]) {
                     ngrok.kill();
-                    var info = 'ngrok: The tunnel ' + urlBusy[1] + ' ' + urlBusy[4];
+                    var info = 'ngrok: The tunnel ' + urlBusy[1] + ' ' + urlBusy[5];
                     grunt.log.writeln(info);
                 }
 
