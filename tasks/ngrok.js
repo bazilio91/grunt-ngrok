@@ -59,7 +59,7 @@ module.exports = function (grunt) {
             !_.includes(_.keys(globalKeyMap), key); 
         });
 
-        yamlConfig[this.target] = yamlOptions;
+        yamlConfig['tunnels'][this.target] = yamlOptions;
 
         fs.writeFileSync(fileName, yaml.safeDump(yamlConfig));
 
