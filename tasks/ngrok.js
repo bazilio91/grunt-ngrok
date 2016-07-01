@@ -9,6 +9,7 @@
 'use strict';
 var yaml = require('js-yaml'),
     fs = require('fs'),
+    _ = require('lodash'),
     os = require('os'),
     spawn = require('child_process').spawn,
     fetcher = require('../lib/fetcher');
@@ -23,14 +24,13 @@ module.exports = function (grunt) {
             task = this,
             options = this.options({
                 authToken: null,
-                serverAddress: null,
                 rootCAS: null,
                 inspectAddress: null,
                 httpProxy: null,
-                port: null,
+                addr: null,
                 proto: 'http',
                 subdomain: this.target + Math.round(Math.random() * 100000),
-                remotePort: null,
+                remoteAddr: null,
                 onConnected: null,
                 files: null
             }, this.data),
@@ -41,23 +41,25 @@ module.exports = function (grunt) {
                 }
             };
 
-        grunt.util._.each({
-            'serverAddress': 'addr',
+        var globalKeyMap = {
             'rootCAS': 'root_cas',
             'authToken': 'authtoken',
             'httpProxy': 'http_proxy'
-        }, function (key, option) {
+        }
+        grunt.util._.each(globalKeyMap, function (key, option) {
             if (options[option] !== null) {
                 yamlConfig[key] = options[option];
             }
         });
 
-        yamlConfig.tunnels[options.subdomain] = {proto: {}};
-        if (options.remotePort) {
-            yamlConfig.tunnels[options.subdomain]['remote_addr'] = parseInt(options.remoteAddr);
-        }
+        var yamlOptions = _.pickBy(options, function (val, key) { 
+          return val !== null &&
+            !_.isFunction(val) && 
+            !_.hasIn(yamlConfig, key) &&
+            !_.includes(_.keys(globalKeyMap), key); 
+        });
 
-        //yamlConfig.tunnels[options.subdomain].proto[options.proto] = options.port;
+        yamlConfig[this.target] = yamlOptions;
 
         fs.writeFileSync(fileName, yaml.safeDump(yamlConfig));
 
@@ -75,6 +77,7 @@ module.exports = function (grunt) {
             );
 
             ngrok.stdout.on('data', function (data) {
+                console.log(data.toString());
                 var urlMatch = data.toString().match(/\[INFO\] \[client\] Tunnel established at ((tcp|https?)..*.([^:\s]*)(:[0-9]+)?)/);
                 if (urlMatch && urlMatch[1]) {
                     tunnelUrl = urlMatch[1];
