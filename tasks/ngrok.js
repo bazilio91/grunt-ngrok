@@ -71,7 +71,7 @@ module.exports = function (grunt) {
             }
 
             var ngrok = spawn(
-                binaryPath, ['-config=' + fileName, '-log=stdout', 'start', options.subdomain]
+                binaryPath, ['start', '-config=' + fileName, '-log=stdout', options.subdomain]
             );
 
             ngrok.stdout.on('data', function (data) {
