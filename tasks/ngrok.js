@@ -24,7 +24,7 @@ module.exports = function (grunt) {
             options = this.options({
                 authToken: null,
                 serverAddress: null,
-                trustHostRootCerts: null,
+                rootCAS: null,
                 inspectAddress: null,
                 httpProxy: null,
                 port: null,
@@ -42,10 +42,9 @@ module.exports = function (grunt) {
             };
 
         grunt.util._.each({
-            'serverAddress': 'server_addr',
-            'trustHostRootCerts': 'trust_host_root_certs',
-            'authToken': 'auth_token',
-            'inspectAddress': 'inspect_addr',
+            'serverAddress': 'addr',
+            'rootCAS': 'root_cas',
+            'authToken': 'authtoken',
             'httpProxy': 'http_proxy'
         }, function (key, option) {
             if (options[option] !== null) {
@@ -55,10 +54,10 @@ module.exports = function (grunt) {
 
         yamlConfig.tunnels[options.subdomain] = {proto: {}};
         if (options.remotePort) {
-            yamlConfig.tunnels[options.subdomain]['remote_port'] = parseInt(options.remotePort);
+            yamlConfig.tunnels[options.subdomain]['remote_addr'] = parseInt(options.remoteAddr);
         }
 
-        yamlConfig.tunnels[options.subdomain].proto[options.proto] = options.port;
+        //yamlConfig.tunnels[options.subdomain].proto[options.proto] = options.port;
 
         fs.writeFileSync(fileName, yaml.safeDump(yamlConfig));
 
