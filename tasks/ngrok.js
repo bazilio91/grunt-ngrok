@@ -19,10 +19,10 @@ var _ = require('lodash'),
 module.exports = function (grunt) {
     var ngrokTunnels = {};
     var filename = __dirname+'/../tmp/ngrok_config.yaml';
-    var url = null;
     
     grunt.registerMultiTask('ngrok', 'Expose localhost to the web.', function () {
         var done = this.async(),
+            completed = false,
             task = this;
   
         var globalConfig = GlobalConfig(this.options());
@@ -42,29 +42,35 @@ module.exports = function (grunt) {
             );
 
             ngrok.stdout.on('data', function (data) {
+                if (completed) { return; }
                 var parser = NgrokOutputParser(data.toString()); 
-                
-                if (parser.foundHTTPSUrl()) { url = parser.getHTTPSUrl(); }
                 
                 if (parser.sessionEstablished()) {
                   if (_.isFunction(globalConfig.onConnected)) {
-                    globalConfig.onConnected(url || 'unknown');
+                    globalConfig.onConnected(parser.getUrl() || 'unknown');
                   }
-                  if (url) { done(); }
+                }
+
+                if (parser.heartbeatDetected()) {
+                  done();
+                  completed = true;
+                  grunt.event.emit('Ngrok: Tunnels opened successfully.');
+                }
+
+                if (parser.tooManyTunnelsOpen()) {
+                  ngrok.kill();
+                  grunt.fatal('Ngrok: Too Many Tunnels Already Open on your Account');
                 }
                 // TODO: Add checks for failed tunnel
             });
 
             ngrok.stderr.on('data', function (data) {
                 ngrok.kill();
-                var info = 'ngrok: process exited due to error\n' + data.toString().substring(0, 10000);
-                grunt.fatal('ngrok: ' + info);
+                grunt.fatal('Ngrok: Failed because of error. Error: \'' + console.log(data.toString()) + '\'');
             });
 
             ngrok.on('close', function () {
-                var tunnelInfo = 'hrmm ';
-                grunt.log.writeln('ngrok: ' + tunnelInfo + 'disconnected');
-
+                grunt.log.writeln('Ngrok: Quiting... No tunnels will be left open.');
                 done();
             });
         });
