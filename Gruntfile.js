@@ -16,7 +16,7 @@ module.exports = function (grunt) {
   function getRandomPort() {
     return Math.round(Math.random() * (65535 - 50000) + 50000);
   }
-  console.log(process.env.AUTHTOKEN);
+
   var tcpPort = getRandomPort();
 
   // Project configuration.
