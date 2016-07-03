@@ -27,98 +27,66 @@ _Run this task with the `grunt ngrok` command._
 
 ### Options
 
-#### authToken
-Type: `String`  
-Default: `null`
+See the ngrok website for details about what each key does (https://ngrok.com/docs)
 
-Authtoken on ngrok.com
+#### Global Config Options
 
-#### port
-Type: `Integer`  
-Default: `8000`
-
-Port of local server
-
-#### proto
-Type: `String`  
-Default: `'http'`
-
-May be `'http'`, `'https'` or `'tcp'`.
-
-#### subdomain
-Type: `String`  
-Default: `target + random nubmer`
-
-Subdomain to acquire on ngrok.com 
-
-#### remotePort
-Type: `Integer`  
-Default: `null`
-
-Port on ngrok.com
-
-#### onConnected
-Type: `function`  
-Default: `null`
-
-Callback function called when url acquired
-
-#### inspectAddress
-Type: `String`
-Default: `null`
-Binary default: `127.0.0.1:4040`
-
-Address that ngrok binds with to serve its web inspection interface
-
-#### httpProxy
-Type: `String`
-Default: `null`
-Example: `"http://user:password@10.0.0.1:3128"`
-
-#### serverAddress
-Type: `String`  
-Default: `null`Binary default: `ngrok.com:4443`
-
-Address of ngrokd server
-
-#### trustHostRootCerts
-Type: `Bool`
-Default: `null`
-Trust ngrok server root CA ot not. See [self hosting guide](https://github.com/inconshreveable/ngrok/blob/master/docs/SELFHOSTING.md#ngrokd-with-a-self-signed-ssl-certificate)
-
-#### files
-Type: `Object`
-Default: equinox.io ngrok official urls
-Example: 
-```js
-{
-  darwinia32: 'http://127.0.0.1/darwinia32.zip',
-  linuxarm: 'http://127.0.0.1/linuxarm.zip',
-}
+```
+authToken
+compressConn
+consolueUI 
+httpProxy
+inspectDBSize 
+log
+logFormat
+logLevel
+metadata
+region
+rootCAS 
+socks5Proxy 
+update 
+updateChannel
+webAddr 
 ```
 
-Urls for your own ngrok client binaries. Zip should contain `ngrok` or `ngrok.exe`.
+#### Tunnel Specific Options
 
+```
+addr
+auth
+bindTLS
+crt
+hostname 
+hostHeader
+inspect
+key
+proto 
+remoteAddr
+subdomain
+```
 
-Example:
+example:
 ```js
 grunt.initConfig({
   ngrok: {
     options: {
-      authToken: '-your-auth-token'
-    },
-    server: {
-      proto: 'tcp',
-      port: 50010,
-      remotePort: 50010,
-      subdomain: 'mytestapp',
+      authToken: '-your-auth-token',
       onConnected: function(url) {
         grunt.log.writeln('Local server exposed to %s!', url);
       }
     },
+    server: {
+      proto: 'tcp',
+      addr: 50010,
+      remoteAddr: 50010,
+      subdomain: 'mytestapp',
+    },
   },
 });
 ```
+
+Notice global go inside the options object, while the new tunnels you want to open (i.e. `server`)
+have their own object, with tunnel specific options in it.
 
 #### Grunt Events
 The ngrok plugin will emit a grunt event, `ngrok.{taskName}.connected`, once connected.
