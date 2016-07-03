@@ -27,7 +27,6 @@ var grunt = require('grunt'),
 exports.ngrok = {
     test: function (test) {
         var results = grunt.config.get('results');
-
         async.each(results, function (result, cb) {
             if (result.task.expect) {
                 test.equal(result.url, result.task.expect);

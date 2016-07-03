@@ -25,10 +25,10 @@ module.exports = function (grunt) {
             completed = false,
             task = this;
   
-        var globalConfig = GlobalConfig(this.options());
-        var tunnelConfigs = _.map(this.data, function(tunnelConfig, tunnelName) { return TunnelConfig(tunnelName, tunnelConfig); });
+        var globalConfig = new GlobalConfig(this.options());
+        var tunnelConfigs = _.map(this.data, function(tunnelConfig, tunnelName) { return new TunnelConfig(tunnelName, tunnelConfig); });
 
-        var writer = ConfigFileWriter(filename, tunnelConfigs, globalConfig);
+        var writer = new ConfigFileWriter(filename, tunnelConfigs, globalConfig);
 
         writer.exportConfigToYaml();
 
@@ -43,7 +43,7 @@ module.exports = function (grunt) {
 
             ngrok.stdout.on('data', function (data) {
                 if (completed) { return; }
-                var parser = NgrokOutputParser(data.toString()); 
+                var parser = new NgrokOutputParser(data.toString()); 
                 
                 if (parser.sessionEstablished()) {
                   if (_.isFunction(globalConfig.onConnected)) {
