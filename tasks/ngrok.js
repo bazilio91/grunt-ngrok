@@ -7,64 +7,30 @@
  */
 
 'use strict';
-var yaml = require('js-yaml'),
-    fs = require('fs'),
+var _ = require('lodash'),
     os = require('os'),
     spawn = require('child_process').spawn,
-    fetcher = require('../lib/fetcher');
-
+    fetcher = require('../lib/fetcher'),
+    GlobalConfig = require('../lib/global_config'),
+    TunnelConfig = require('../lib/tunnel_config'),
+    ConfigFileWriter = require('../lib/config_file_writer'),
+    NgrokOutputParser = require('../lib/ngrok_output_parser');
 
 module.exports = function (grunt) {
     var ngrokTunnels = {};
-
+    var filename = __dirname+'/../tmp/ngrok_config.yaml';
+    
     grunt.registerMultiTask('ngrok', 'Expose localhost to the web.', function () {
         var done = this.async(),
-            tunnelUrl,
-            task = this,
-            options = this.options({
-                authToken: null,
-                serverAddress: null,
-                trustHostRootCerts: null,
-                inspectAddress: null,
-                httpProxy: null,
-                port: null,
-                proto: 'http',
-                subdomain: this.target + Math.round(Math.random() * 100000),
-                remotePort: null,
-                onConnected: null,
-                files: null
-            }, this.data),
-            fileName = __dirname + '/../tmp/' + this.target + '.yaml',
-            yamlConfig = {
-                tunnels: {
+            completed = false,
+            task = this;
+  
+        var globalConfig = new GlobalConfig(this.options());
+        var tunnelConfigs = _.map(this.data, function(tunnelConfig, tunnelName) { return new TunnelConfig(tunnelName, tunnelConfig); });
 
-                }
-            };
+        var writer = new ConfigFileWriter(filename, tunnelConfigs, globalConfig);
 
-        grunt.util._.each({
-            'serverAddress': 'server_addr',
-            'trustHostRootCerts': 'trust_host_root_certs',
-            'authToken': 'auth_token',
-            'inspectAddress': 'inspect_addr',
-            'httpProxy': 'http_proxy'
-        }, function (key, option) {
-            if (options[option] !== null) {
-                yamlConfig[key] = options[option];
-            }
-        });
-
-        yamlConfig.tunnels[options.subdomain] = {proto: {}};
-        if (options.remotePort) {
-            yamlConfig.tunnels[options.subdomain]['remote_port'] = parseInt(options.remotePort);
-        }
-
-        yamlConfig.tunnels[options.subdomain].proto[options.proto] = options.port;
-
-        fs.writeFileSync(fileName, yaml.safeDump(yamlConfig));
-
-        if (options.files !== null) {
-            fetcher.files = options.files;
-        }
+        writer.exportConfigToYaml();
 
         fetcher.getBinary(function (err, binaryPath) {
             if (err) {
@@ -72,43 +38,39 @@ module.exports = function (grunt) {
             }
 
             var ngrok = spawn(
-                binaryPath, ['-config=' + fileName, '-log=stdout', 'start', options.subdomain]
+                binaryPath, ['start', '--all', '-config=' + filename, '-log=stdout']
             );
 
             ngrok.stdout.on('data', function (data) {
-                var urlMatch = data.toString().match(/\[INFO\] \[client\] Tunnel established at ((tcp|https?)..*.([^:\s]*)(:[0-9]+)?)/);
-                if (urlMatch && urlMatch[1]) {
-                    tunnelUrl = urlMatch[1];
-                    ngrokTunnels[tunnelUrl] = ngrok;
-                    grunt.log.writeln('ngrok: tunnel established at ' + tunnelUrl);
-                    if (typeof options.onConnected === 'function') {
-                        options.onConnected(tunnelUrl);
-                    }
-                    done();
-                    return grunt.event.emit('ngrok.' + task.target + '.connected', tunnelUrl);
-                }
-                var urlBusy = data.toString().match(/\[EROR\] \[client\] Server failed to allocate tunnel: The tunnel ((tcp|http|https)..*.([^:]*)([0-9]+)?) (.*is already registered)/);
-                if (urlBusy && urlBusy[1]) {
-                    ngrok.kill();
-                    var info = 'ngrok: The tunnel ' + urlBusy[1] + ' ' + urlBusy[5];
-                    grunt.log.writeln(info);
+                if (completed) { return; }
+                var parser = new NgrokOutputParser(data.toString()); 
+                
+                if (parser.sessionEstablished()) {
+                  if (_.isFunction(globalConfig.onConnected)) {
+                    globalConfig.onConnected(parser.getUrl() || 'unknown');
+                  }
                 }
 
-                if (data.toString().indexOf('Server failed to allocate tunnel') !== -1) {
-                    grunt.fatal('ngrok: ' + data.toString());
+                if (parser.heartbeatDetected()) {
+                  done();
+                  completed = true;
+                  grunt.event.emit('Ngrok: Tunnels opened successfully.');
                 }
+
+                if (parser.tooManyTunnelsOpen()) {
+                  ngrok.kill();
+                  grunt.fatal('Ngrok: Too Many Tunnels Already Open on your Account');
+                }
+                // TODO: Add checks for failed tunnel
             });
 
             ngrok.stderr.on('data', function (data) {
                 ngrok.kill();
-                var info = 'ngrok: process exited due to error\n' + data.toString().substring(0, 10000);
-                grunt.fatal('ngrok: ' + info);
+                grunt.fatal('Ngrok: Failed because of error. Error: \'' + console.log(data.toString()) + '\'');
             });
 
             ngrok.on('close', function () {
-                var tunnelInfo = tunnelUrl ? tunnelUrl + ' ' : '';
-                grunt.log.writeln('ngrok: ' + tunnelInfo + 'disconnected');
-
+                grunt.log.writeln('Ngrok: Quiting... No tunnels will be left open.');
                 done();
             });
         });

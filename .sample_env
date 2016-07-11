@@ -1,0 +1,3 @@
+# Create a file called '.env' and put this in it, with your values filled in
+AUTHTOKEN='YOUR_TOKEN'
+
