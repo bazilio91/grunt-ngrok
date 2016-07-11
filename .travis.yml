@@ -5,4 +5,4 @@ node_js:
 before_script:
   - npm install -g grunt-cli
 script:
-  - grunt test -d -stack
+  - AUTHTOKEN='-LgL9yAD_PcQoSXfhD2q' grunt test -d -stack
