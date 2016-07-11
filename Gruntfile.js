@@ -48,12 +48,6 @@ module.exports = function (grunt) {
           proto: 'http',
           addr: 50000
         },
-        httpSubdomain: {
-          proto: 'http',
-          addr: 50000,
-          subdomain: 'grunt-ngrok-test' + tcpPort, // just for random
-          expect: 'http://grunt-ngrok-test' + tcpPort + '.ngrok.com'
-        },
         tcp: {
           name: 'tcp',
           proto: 'tcp',
