@@ -1,9 +1,19 @@
 language: node_js
 node_js:
-  - "0.11"
-  - "0.10"
+- node
+- 6
+- 5
+- 4
 before_script:
-  - npm install -g grunt-cli
-  - echo AUTHTOKEN='3C85S8y6oyEKCaneNnNXd_5Rzf7KS71zfggsujwXbHv' >> .env 
+- npm install -g grunt-cli
+- echo AUTHTOKEN='3C85S8y6oyEKCaneNnNXd_5Rzf7KS71zfggsujwXbHv' >> .env
 script:
-  - grunt test -d -stack
+- grunt test -d -stack
+deploy:
+  provider: npm
+  email: bazilio91@gmail.com
+  api_key:
+    secure: q7PHXZXhHOh/sH8BSvRjalFrVeLqUaJyHLkW1ONpqjIUNCUTkzresCkJS2A380rnnPMbVodv3r/hYRDPTL1fxpVyEcBkEEDn8FQE4l6DwiFjbSAsdtObaTnLrdoxMOX6PGEXbK9DaRWmSZmPCyHe3x40/ZN8I1Ip53PmkaNOjB8=
+  on:
+    tags: true
+    repo: bazilio91/grunt-ngrok
