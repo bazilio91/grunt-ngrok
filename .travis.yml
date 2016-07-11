@@ -5,7 +5,8 @@ node_js:
 - 5
 - 4
 before_script:
-- npm install -g grunt grunt-cli
+- npm install -g grunt-cli
+- npm install grunt
 - echo AUTHTOKEN='3C85S8y6oyEKCaneNnNXd_5Rzf7KS71zfggsujwXbHv' >> .env
 script:
 - grunt test -d -stack
